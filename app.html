@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Captured! Cards — Buylist graphics</title>
+<link rel="icon" href="icons/icon32.png">
+<link rel="stylesheet" href="app.css">
+<script src="lib/html2canvas.min.js"></script>
+<script src="lib/jszip.min.js"></script>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div class="brand"><img src="assets/captured-cards-logo.svg" alt="Captured! Cards" class="brand-logo"><em>Buylist graphics</em></div>
+    <div class="top-actions">
+      <span class="status" id="saveStatus" aria-live="polite"></span>
+      <button class="btn primary" id="dlAll" type="button">Download all (.zip)</button>
+    </div>
+  </div>
+</header>
+
+<main class="layout">
+  <div>
+    <section class="panel" aria-labelledby="h-cards">
+      <div class="panel-head">
+        <h2 id="h-cards"><span class="step">1</span>Cards you're buying</h2>
+        <span class="hint" id="cardCount"></span>
+      </div>
+      <div class="dropzone" id="bulkDrop" tabindex="0" role="button" aria-describedby="bulkHint">
+        <strong>Drop card images here</strong>
+        <span id="bulkHint" class="hint">Each image becomes a new card, named from its file name. Or click to choose files.</span>
+      </div>
+      <input type="file" id="bulkFile" accept="image/*" multiple hidden>
+      <div class="cards" id="cards"></div>
+      <div class="list-actions">
+        <button class="btn" type="button" id="addCard">Add card</button>
+        <button class="btn" type="button" id="sortPrice">Sort by price</button>
+        <button class="btn" type="button" id="clearAll">Clear list</button>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="h-set">
+      <div class="panel-head"><h2 id="h-set"><span class="step">2</span>Post details</h2></div>
+      <div class="settings">
+        <div class="f"><label for="sDate">Buylist date</label><input id="sDate" data-s="date"></div>
+        <div class="f"><label for="sSocial">Social call to action</label><input id="sSocial" data-s="social"></div>
+        <div class="f"><label for="sCash">Regular cash rate (%)</label><input id="sCash" data-s="cash" inputmode="numeric"></div>
+        <div class="f"><label for="sTrade">Regular trade rate (%)</label><input id="sTrade" data-s="trade" inputmode="numeric"></div>
+        <div class="f"><label for="sPhone">Phone (web banners)</label><input id="sPhone" data-s="phone"></div>
+        <div class="f"><label for="sLoc">Location</label><input id="sLoc" data-s="loc"></div>
+        <div class="f"><span id="lGround" style="font-size:12px;font-weight:600;color:var(--muted)">Background</span><div class="swatches" role="group" aria-labelledby="lGround" id="swGround"></div></div>
+        <div class="f"><span id="lAccent" style="font-size:12px;font-weight:600;color:var(--muted)">Price bars</span><div class="swatches" role="group" aria-labelledby="lAccent" id="swAccent"></div></div>
+      </div>
+    </section>
+  </div>
+
+  <div>
+    <section class="panel" aria-labelledby="h-tpl">
+      <div class="panel-head"><h2 id="h-tpl"><span class="step">3</span>Templates</h2><span class="hint" id="pageCount"></span></div>
+      <div id="tpls"></div>
+    </section>
+    <section class="panel" aria-labelledby="h-prev">
+      <div class="panel-head"><h2 id="h-prev"><span class="step">4</span>Preview and download</h2><span class="hint">Click any preview to see it full size.</span></div>
+      <div class="previews" id="previews"></div>
+    </section>
+    <section class="panel" aria-labelledby="h-post" id="postPanel">
+      <div class="panel-head">
+        <h2 id="h-post"><span class="step">5</span>Post with Muse</h2>
+        <button class="btn small" type="button" id="museSetupBtn">Muse setup</button>
+      </div>
+      <p class="hint" style="margin-bottom:16px">Pick where, what and when. The extension saves the images and writes Muse's instructions; Muse previews everything and waits for your OK before anything goes live.</p>
+
+      <fieldset class="pf">
+        <legend>Where</legend>
+        <div class="dests" id="dests"></div>
+        <div class="settings" style="margin-top:12px">
+          <div class="f"><label for="pIg">Instagram account</label><input id="pIg" data-p="ig" placeholder="@yourhandle"></div>
+          <div class="f"><label for="pFb">Facebook Page</label><input id="pFb" data-p="fb" placeholder="Captured! Cards"></div>
+        </div>
+      </fieldset>
+
+      <fieldset class="pf">
+        <legend>What</legend>
+        <div class="f">
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:8px;flex-wrap:wrap"><label for="pCaption">Caption</label><button class="btn small" type="button" id="rebuildCaption">Rebuild from cards</button></div>
+          <textarea id="pCaption" data-p="caption" rows="9"></textarea>
+          <span class="hint" id="capCount"></span>
+        </div>
+        <div class="f" style="margin-top:10px"><label for="pTags">Hashtags</label><input id="pTags" data-p="hashtags" placeholder="#pokemontcg #burnaby"></div>
+        <label class="chk" style="margin-top:10px"><input type="checkbox" id="pFbSame" data-pc="fbSame"> Use the same caption on Facebook</label>
+        <div class="f" id="fbCapWrap" style="margin-top:10px"><label for="pFbCaption">Facebook caption</label><textarea id="pFbCaption" data-p="fbCaption" rows="7"></textarea></div>
+        <p class="hint" id="whatSummary" style="margin-top:10px"></p>
+      </fieldset>
+
+      <fieldset class="pf">
+        <legend>When</legend>
+        <div class="modes">
+          <label class="mode"><input type="radio" name="pMode" value="now"><span><b>Post now, after I approve</b><small>Muse shows a staging preview of every post and publishes only when you reply "approve".</small></span></label>
+          <label class="mode"><input type="radio" name="pMode" value="peak"><span><b>Post at a peak time</b><small>Muse picks the best time inside your window from your accounts' insights, then confirms with you.</small></span></label>
+        </div>
+        <div id="peakFields" class="settings" style="margin-top:12px">
+          <div class="f"><label for="pStart">Earliest</label><input type="datetime-local" id="pStart" data-p="winStart"></div>
+          <div class="f"><label for="pEnd">Latest</label><input type="datetime-local" id="pEnd" data-p="winEnd"></div>
+          <div class="f wide"><label for="pFallback">If Muse can't see insights, aim for</label>
+            <select id="pFallback" data-p="fallback">
+              <option value="evening">Evenings (6:00–8:30 pm)</option>
+              <option value="lunch">Weekday lunch (11:30 am–1:00 pm)</option>
+              <option value="weekend">Weekend late morning (10:00 am–12:30 pm)</option>
+              <option value="muse">Let Muse decide</option>
+            </select>
+          </div>
+          <label class="chk wide"><input type="checkbox" id="pConfirm" data-pc="confirmTime"> Ask me to confirm the chosen time before scheduling</label>
+          <p class="hint wide" id="tzNote"></p>
+        </div>
+      </fieldset>
+
+      <div id="postErrors" class="errors" role="alert"></div>
+      <div class="list-actions">
+        <button class="btn primary" type="button" id="reviewBtn">Review and send to Muse</button>
+      </div>
+
+      <div id="historyWrap" style="margin-top:22px"></div>
+    </section>
+  </div>
+</main>
+
+<dialog id="reviewDlg" aria-labelledby="reviewTitle">
+  <div class="dlg-head"><strong id="reviewTitle">Check before sending to Muse</strong><button class="btn small" type="button" data-close="reviewDlg">Close</button></div>
+  <div class="dlg-pad" id="reviewBody"></div>
+</dialog>
+
+<dialog id="setupDlg" aria-labelledby="setupTitle">
+  <div class="dlg-head"><strong id="setupTitle">Muse setup (one time)</strong><button class="btn small" type="button" data-close="setupDlg">Close</button></div>
+  <div class="dlg-pad">
+    <p>Muse can see your Instagram and Facebook, but it publishes and schedules through a social posting connector. Set this up once in Muse:</p>
+    <ol class="steps">
+      <li>In Muse, open <b>Connectors</b> and add a social posting connector, for example Postiz, Buffer or PostFast. Connect your Instagram account and your Facebook Page through it.</li>
+      <li>Make sure the Instagram account is a <b>Business</b> or <b>Creator</b> account and is linked to the Facebook Page. Instagram only allows posting by apps to those account types.</li>
+      <li>Save the instructions below as a Muse <b>skill</b>, so every buylist post goes through the same staging step.</li>
+    </ol>
+    <div class="f"><label for="skillText">Skill to save in Muse</label><textarea id="skillText" rows="8" readonly></textarea></div>
+    <div class="list-actions"><button class="btn primary" type="button" id="copySkill">Copy skill</button><button class="btn" type="button" id="openMuse2">Open Muse</button></div>
+  </div>
+</dialog>
+
+<dialog id="dlg" aria-labelledby="dlgTitle">
+  <div class="dlg-head">
+    <strong id="dlgTitle"></strong>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn small" type="button" id="dlgPrev">Previous</button>
+      <button class="btn small" type="button" id="dlgNext">Next</button>
+      <button class="btn small primary" type="button" id="dlgDl">Download PNG</button>
+      <button class="btn small" type="button" id="dlgClose">Close</button>
+    </div>
+  </div>
+  <div class="dlg-body" id="dlgBody"></div>
+</dialog>
+
+<div class="overlay" id="overlay" aria-live="assertive"></div>
+<div id="renderHost" aria-hidden="true"></div>
+<div class="toast" id="toast" role="status"><span id="toastMsg"></span><button type="button" id="toastBtn" hidden>Undo</button></div>
+<style id="imgStyles"></style>
+
+<script src="app.js"></script>
+</body>
+</html>

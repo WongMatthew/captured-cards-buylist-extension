@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Captured! Cards Buylist Graphics",
+  "short_name": "Buylist Graphics",
+  "version": "1.3.1",
+  "description": "Make Captured! Cards buylist posts, stories and web banners, then hand them to Muse to post on Instagram and Facebook.",
+  "action": {
+    "default_title": "Open Buylist Graphics",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "storage",
+    "unlimitedStorage",
+    "downloads"
+  ]
+}
