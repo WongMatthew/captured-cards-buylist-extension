@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Captured! Cards - Buylist graphics",
+  "short_name": "Buylist graphics",
+  "version": "1.7.0",
+  "description": "Edit the cards on capturedcards.com's \"We're buying\" list, make Instagram, story and website graphics, and publish the story to Instagram with music.",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "Open Buylist graphics",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": [
+    "https://capturedcards.myshopify.com/*",
+    "https://capturedcards.com/*",
+    "https://cdn.shopify.com/*",
+    "https://shopify-staged-uploads.storage.googleapis.com/*",
+    "https://storage.googleapis.com/*",
+    "https://mp-search-api.tcgplayer.com/*",
+    "https://graph.facebook.com/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  },
+  "permissions": [
+    "downloads"
+  ]
+}
